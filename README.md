@@ -1,4 +1,4 @@
 moodle-block_course_descendants
 ===============================
 
-Provides practical access to descedant courses of a metacourse
+Provides practical access to descendant courses of a metacourse
