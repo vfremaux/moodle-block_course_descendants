@@ -1,9 +1,8 @@
-<?php //$Id: block_course_descendants.php,v 1.1.2.1 2012/02/26 14:04:38 diml Exp $
+<?php //$Id: block_course_descendants.php,v 1.4 2012-07-18 16:10:13 vf Exp $
 
 class block_course_descendants extends block_list {
     function init() {
         $this->title = get_string('title', 'block_course_descendants');
-        $this->version = 2012022000;
     }
 
     function has_config() {
@@ -14,21 +13,20 @@ class block_course_descendants extends block_list {
         return true;
     }
 
-
     function applicable_formats() {
         return array('all' => false, 'course' => true, 'site' => false);
     }
 
     function specialization() {
         if (!empty($this->config->blocktitle)){
-        	$this->title = filter_string($this->config->blocktitle);
+        	$this->title = format_string($this->config->blocktitle);
         } else {
         	$this->title = '';
         }
     }
 
     function get_content() {
-        global $THEME, $CFG, $COURSE, $USER;
+        global $THEME, $CFG, $COURSE, $USER, $DB;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -36,27 +34,34 @@ class block_course_descendants extends block_list {
 
         // fetch direct ascendants that are metas who point the current course as descendant
         // Admin sees all descendants
-        if (@$this->config->checkenrollment && !has_capability('moodle/site:doanything', get_context_instance(CONTEXT_SYSTEM))){
+        if (@$this->config->checkenrollment && !has_capability('moodle/site:config', context_system::instance())){
 	        $sql = "
 	             SELECT DISTINCT 
 	                c.id,
 	                c.shortname,
 	                c.fullname,
 	                c.sortorder,
-	                c.visible
+	                c.visible,
+					cc.name as catname,
+					cc.id as catid,
+					cc.visible as catvisible
 	             FROM 
-	                 {$CFG->prefix}course c,
-	                 {$CFG->prefix}course_meta mc,
-	                 {$CFG->prefix}context co,
-	                 {$CFG->prefix}role_assignments ra
+	                 {course} c,
+	                 {course_categories} cc,
+	                 {enrol} e,
+	                 {context} co,
+	                 {role_assignments} ra
 	             WHERE
-	                c.id = mc.child_course AND
-	                mc.parent_course = {$COURSE->id} AND
+	                cc.id = c.category AND
+	                e.customint1 = c.id AND
+	                e.courseid = ? AND
+	                e.enrol = 'meta' AND
 	                co.instanceid = c.id AND
 	                co.contextlevel = ".CONTEXT_COURSE." AND
 	                ra.contextid = co.id AND
 	                ra.userid = {$USER->id}
 	             ORDER BY
+	                 cc.sortorder,
 	                 c.sortorder
 	        ";
 	    } else {
@@ -66,19 +71,26 @@ class block_course_descendants extends block_list {
 	                c.shortname,
 	                c.fullname,
 	                c.sortorder,
-	                c.visible
+	                c.visible,
+					cc.id as catid,
+					cc.name as catname,
+					cc.visible as catvisible
 	             FROM 
-	                 {$CFG->prefix}course c,
-	                 {$CFG->prefix}course_meta mc
+	                 {course} c,
+	                 {course_categories} cc,
+	                 {enrol} e
 	             WHERE
-	                c.id = mc.child_course AND
-	                mc.parent_course = {$COURSE->id}
+	                cc.id = c.category AND
+	                e.courseid = ? AND
+	                e.enrol = 'meta' AND
+	                e.customint1 = c.id
 	             ORDER BY
+	                 cc.sortorder,
 	                 c.sortorder
 	        ";
 	    }
 
-        $descendants = get_records_sql($sql);
+        $descendants = $DB->get_records_sql($sql, array($COURSE->id));
         
         $this->content = new stdClass;
         $this->content->items = array();
@@ -86,10 +98,21 @@ class block_course_descendants extends block_list {
         $this->content->footer = '';
         
         if ($descendants) {
+        	$categorymem = '';
             foreach ($descendants as $descendant) {
+            	
+				$catcontext = context_coursecat::instance($descendant->catid);
+				if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)){
+					continue;
+				}
+           	
+            	if ($categorymem != $descendant->catname){
+            		$categorymem = $descendant->catname;
+            		$this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
+            	}
 
-                // TODO : check visibility on upper categories
-                $context = get_context_instance(CONTEXT_COURSE, $descendant->id);
+                // TODO : check visibility on course
+                $context = context_course::instance($descendant->id);
                 
                 if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)){
 
@@ -97,13 +120,13 @@ class block_course_descendants extends block_list {
                     $this->content->icons[] = $icon;
                     
                     if (!empty($this->config->stringlimit)){
-	                    $fullname = shorten_text($descendant->fullname, 0 + @$this->config->stringlimit);
+	                    $fullname = shorten_text(format_string($descendant->fullname), 0 + @$this->config->stringlimit);
 	                } else {
-	                    $fullname = $descendant->fullname;
+	                    $fullname = format_string($descendant->fullname);
 	                }
     
-                    $this->content->items[]="<a title=\"" .s($descendant->fullname).
-                        "\" href=\"{$CFG->wwwroot}/course/view.php?id={$descendant->id}\">{$fullname}</a>";
+    				$coursename = format_string($descendant->fullname);
+                    $this->content->items[] = "<a title=\"" .s($coursename)."\" href=\"{$CFG->wwwroot}/course/view.php?id={$descendant->id}\">{$coursename}</a>";
                 }
             }
         } else {
@@ -120,8 +143,10 @@ class block_course_descendants extends block_list {
     function user_can_addto($page) {
         global $CFG, $COURSE;
 
-        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-        if (has_capability('block/course_descendants:canaddto', $context)){
+		return true;
+
+        $context = context_course::instance($COURSE->id);
+        if (has_capability('block/course_descendants:addinstance', $context)){
         	return true;
         }
         return false;
@@ -133,15 +158,14 @@ class block_course_descendants extends block_list {
     function user_can_edit() {
         global $CFG, $COURSE;
 
-        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        $context = context_course::instance($COURSE->id);
         
         if (has_capability('block/course_descendants:configure', $context)){
  	       return true;
         }
 
 		return false;
-    }
-	
+    }	
 }
 
 ?>
