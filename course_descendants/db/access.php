@@ -1,6 +1,6 @@
 <?php
 //
-// Capability definitions for the block vmoodle.
+// Capability definitions for the block course_descendants.
 //
 // The capabilities are loaded into the database table when the module is
 // installed or updated. Whenever the capability definitions are updated,
@@ -30,14 +30,14 @@
 //
 // For the core capabilities, the variable is $moodle_capabilities.
 
-$block_course_descendants_capabilities = array(
+$capabilities = array(
 
-    'block/course_descendants:canaddto' => array(
+    'block/course_descendants:addinstance' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
-            'admin' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         )
     ),
 
@@ -46,7 +46,7 @@ $block_course_descendants_capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
-            'admin' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         )
     ),
 );

@@ -18,16 +18,15 @@
  * Version details
  *
  * @package    block
- * @subpackage section_links
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @subpackage course_descendants
+ * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Moodle 1.9 version
-$plugin->version   = 2012022000;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2007101510;        // Requires this Moodle version
-$plugin->release = '1.9.0 (Build 2012022000)';
+$plugin->version   = 2013011800;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2011120503;        // Requires this Moodle version
+$plugin->release = '2.2.0 (Build 2013011800)';
 $plugin->component = 'block_course_descendants'; // Full name of the plugin (used for diagnostics)
 $plugin->maturity = MATURITY_RC;
