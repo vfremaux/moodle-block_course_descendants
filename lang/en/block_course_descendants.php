@@ -1,5 +1,9 @@
 <?php
 
+// Capabilities
+$string['course_descendants:addinstance'] = 'Can add an instance';
+$string['course_descendants:configure'] = 'Can configure';
+
 $string['title'] = 'Master courses';
 $string['configblocktitle'] = 'Title (leave blank to hide)';
 $string['blockname'] = 'Descendants courses';

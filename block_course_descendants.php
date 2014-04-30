@@ -167,5 +167,3 @@ class block_course_descendants extends block_list {
 		return false;
     }	
 }
-
-?>
