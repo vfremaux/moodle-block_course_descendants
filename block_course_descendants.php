@@ -1,6 +1,30 @@
-<?php //$Id: block_course_descendants.php,v 1.4 2012-07-18 16:10:13 vf Exp $
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Main class
+ *
+ * @package    block
+ * @subpackage course_descendants
+ * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 class block_course_descendants extends block_list {
+
     function init() {
         $this->title = get_string('title', 'block_course_descendants');
     }
@@ -8,7 +32,7 @@ class block_course_descendants extends block_list {
     function has_config() {
         return false;
     }
-    
+
     function instance_allow_config() {
         return true;
     }
@@ -18,10 +42,10 @@ class block_course_descendants extends block_list {
     }
 
     function specialization() {
-        if (!empty($this->config->blocktitle)){
-        	$this->title = format_string($this->config->blocktitle);
+        if (!empty($this->config->blocktitle)) {
+            $this->title = format_string($this->config->blocktitle);
         } else {
-        	$this->title = '';
+            $this->title = '';
         }
     }
 
@@ -32,63 +56,63 @@ class block_course_descendants extends block_list {
             return $this->content;
         }
 
-        // fetch direct ascendants that are metas who point the current course as descendant
-        // Admin sees all descendants
-        if (@$this->config->checkenrollment && !has_capability('moodle/site:config', context_system::instance())){
-	        $sql = "
-	             SELECT DISTINCT 
-	                c.id,
-	                c.shortname,
-	                c.fullname,
-	                c.sortorder,
-	                c.visible,
-					cc.name as catname,
-					cc.id as catid,
-					cc.visible as catvisible
-	             FROM 
-	                 {course} c,
-	                 {course_categories} cc,
-	                 {enrol} e,
-	                 {context} co,
-	                 {role_assignments} ra
-	             WHERE
-	                cc.id = c.category AND
-	                e.customint1 = c.id AND
-	                e.courseid = ? AND
-	                e.enrol = 'meta' AND
-	                co.instanceid = c.id AND
-	                co.contextlevel = ".CONTEXT_COURSE." AND
-	                ra.contextid = co.id AND
-	                ra.userid = {$USER->id}
-	             ORDER BY
-	                 cc.sortorder,
-	                 c.sortorder
-	        ";
-	    } else {
-	        $sql = "
-	             SELECT DISTINCT 
-	                c.id,
-	                c.shortname,
-	                c.fullname,
-	                c.sortorder,
-	                c.visible,
-					cc.id as catid,
-					cc.name as catname,
-					cc.visible as catvisible
-	             FROM 
-	                 {course} c,
-	                 {course_categories} cc,
-	                 {enrol} e
-	             WHERE
-	                cc.id = c.category AND
-	                e.courseid = ? AND
-	                e.enrol = 'meta' AND
-	                e.customint1 = c.id
-	             ORDER BY
-	                 cc.sortorder,
-	                 c.sortorder
-	        ";
-	    }
+        // Fetch direct ascendants that are metas who point the current course as descendant.
+        // Admin sees all descendants.
+        if (@$this->config->checkenrollment && !has_capability('moodle/site:config', context_system::instance())) {
+            $sql = "
+                 SELECT DISTINCT 
+                    c.id,
+                    c.shortname,
+                    c.fullname,
+                    c.sortorder,
+                    c.visible,
+                    cc.name as catname,
+                    cc.id as catid,
+                    cc.visible as catvisible
+                 FROM 
+                     {course} c,
+                     {course_categories} cc,
+                     {enrol} e,
+                     {context} co,
+                     {role_assignments} ra
+                 WHERE
+                    cc.id = c.category AND
+                    e.customint1 = c.id AND
+                    e.courseid = ? AND
+                    e.enrol = 'meta' AND
+                    co.instanceid = c.id AND
+                    co.contextlevel = ".CONTEXT_COURSE." AND
+                    ra.contextid = co.id AND
+                    ra.userid = {$USER->id}
+                 ORDER BY
+                     cc.sortorder,
+                     c.sortorder
+            ";
+        } else {
+            $sql = "
+                 SELECT DISTINCT 
+                    c.id,
+                    c.shortname,
+                    c.fullname,
+                    c.sortorder,
+                    c.visible,
+                    cc.id as catid,
+                    cc.name as catname,
+                    cc.visible as catvisible
+                 FROM 
+                     {course} c,
+                     {course_categories} cc,
+                     {enrol} e
+                 WHERE
+                    cc.id = c.category AND
+                    e.courseid = ? AND
+                    e.enrol = 'meta' AND
+                    e.customint1 = c.id
+                 ORDER BY
+                     cc.sortorder,
+                     c.sortorder
+            ";
+        }
 
         $descendants = $DB->get_records_sql($sql, array($COURSE->id));
         
@@ -96,74 +120,74 @@ class block_course_descendants extends block_list {
         $this->content->items = array();
         $this->content->icons = array();
         $this->content->footer = '';
-        
+
         if ($descendants) {
-        	$categorymem = '';
+            $categorymem = '';
             foreach ($descendants as $descendant) {
-            	
-				$catcontext = context_coursecat::instance($descendant->catid);
-				if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)){
-					continue;
-				}
-           	
-            	if ($categorymem != $descendant->catname){
-            		$categorymem = $descendant->catname;
-            		$this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
-            	}
+
+                $catcontext = context_coursecat::instance($descendant->catid);
+                if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)) {
+                    continue;
+                }
+
+                if ($categorymem != $descendant->catname) {
+                    $categorymem = $descendant->catname;
+                    $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
+                }
 
                 // TODO : check visibility on course
                 $context = context_course::instance($descendant->id);
-                
-                if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)){
+
+                if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)) {
 
                     $icon  = '';
                     $this->content->icons[] = $icon;
-                    
-                    if (!empty($this->config->stringlimit)){
-	                    $fullname = shorten_text(format_string($descendant->fullname), 0 + @$this->config->stringlimit);
-	                } else {
-	                    $fullname = format_string($descendant->fullname);
-	                }
-    
-    				$coursename = format_string($descendant->fullname);
+
+                    if (!empty($this->config->stringlimit)) {
+                        $fullname = shorten_text(format_string($descendant->fullname), 0 + @$this->config->stringlimit);
+                    } else {
+                        $fullname = format_string($descendant->fullname);
+                    }
+
+                    $coursename = format_string($descendant->fullname);
                     $this->content->items[] = "<a title=\"" .s($coursename)."\" href=\"{$CFG->wwwroot}/course/view.php?id={$descendant->id}\">{$coursename}</a>";
                 }
             }
         } else {
-        	// if no descendants, make block invisible for everyone except when editing.
-        	$this->title = '';
+            // If no descendants, make block invisible for everyone except when editing.
+            $this->title = '';
         }
 
         return $this->content;
     }
 
     /**
-    *
-    */
+     *
+     */
     function user_can_addto($page) {
         global $CFG, $COURSE;
 
-		return true;
+        return true;
 
         $context = context_course::instance($COURSE->id);
-        if (has_capability('block/course_descendants:addinstance', $context)){
-        	return true;
+        if (has_capability('block/course_descendants:addinstance', $context)) {
+            return true;
         }
         return false;
     }
 
     /**
-    *
-    */
+     *
+     */
     function user_can_edit() {
         global $CFG, $COURSE;
 
         $context = context_course::instance($COURSE->id);
         
-        if (has_capability('block/course_descendants:configure', $context)){
- 	       return true;
+        if (has_capability('block/course_descendants:configure', $context)) {
+            return true;
         }
 
-		return false;
-    }	
+        return false;
+    }
 }

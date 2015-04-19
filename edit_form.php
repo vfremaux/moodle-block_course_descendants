@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,7 +30,7 @@ class block_course_descendants_edit_form extends block_edit_form {
 
     function specific_definition($mform) {
         global $CFG,$DB, $COURSE;
-      
+
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
         $mform->addElement('text', 'config_blocktitle', get_string('configblocktitle', 'block_course_descendants'));
