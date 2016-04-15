@@ -94,8 +94,8 @@ class block_course_descendants extends block_list {
                      {role_assignments} ra
                  WHERE
                     cc.id = c.category AND
-                    e.courseid = c.id AND
-                    e.customint1 = ? AND
+                    e.customint1 = c.id AND
+                    e.courseid = ? AND
                     e.enrol = 'meta' AND
                     co.instanceid = c.id AND
                     co.contextlevel = ".CONTEXT_COURSE." AND
@@ -122,9 +122,9 @@ class block_course_descendants extends block_list {
                      {enrol} e
                  WHERE
                     cc.id = c.category AND
-                    e.customint1 = ? AND
+                    e.courseid = ? AND
                     e.enrol = 'meta' AND
-                    e.courseid = c.id
+                    e.customint1 = c.id
                  ORDER BY
                      cc.sortorder,
                      c.sortorder
