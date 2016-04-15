@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Main class
  *
- * @package    block
- * @subpackage course_descendants
+ * @package    block_course_descendants
+ * @category   blocks
  * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -59,7 +61,7 @@ class block_course_descendants extends block_list {
         $blockcontext = context_block::instance($this->instance->id);
 
         if (!enrol_is_enabled('meta')) {
-            if (has_capability('block/course_descendants:configure', $context)) {
+            if (has_capability('block/course_descendants:configure', $blockcontext)) {
                 $this->content = new stdClass;
                 $this->content->items = array();
                 $this->content->icons = array();
@@ -168,7 +170,12 @@ class block_course_descendants extends block_list {
 
                     $coursename = format_string($descendant->fullname);
                     $courseurl = new moodle_url('/course/view.php', array('id' => $descendant->id));
-                    $this->content->items[] = '<a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
+                    $item = '<a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
+                    if (!empty($this->config->showdescription)) {
+                        $description = format_text($descendant->summary);
+                        $item .= '<div class="block-descendants course-description">'.$description.'</div>';
+                    }
+                    $this->content->items[] = $item;
                 }
             }
         } else {
@@ -177,6 +184,18 @@ class block_course_descendants extends block_list {
         }
 
         return $this->content;
+    }
+
+    /**
+     * Serialize and store config data
+     */
+    function instance_config_save($data, $nolongerused = false) {
+        global $DB;
+
+        if (!isset($data->showdescription)) $data->showdescription = 0;
+        if (!isset($data->checkenrollment)) $data->checkenrollment = 0;
+
+        parent::instance_config_save($data, false);
     }
 
     /**
