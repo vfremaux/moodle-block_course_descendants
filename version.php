@@ -17,8 +17,8 @@
 /**
  * Version details
  *
- * @package    block
- * @subpackage course_descendants
+ * @package    block_course_descendants
+ * @category   blocks
  * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

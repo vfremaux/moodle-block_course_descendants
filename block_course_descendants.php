@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Main class
  *
- * @package    block
- * @subpackage course_descendants
+ * @package    block_course_descendants
+ * @category   blocks
  * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -56,11 +58,28 @@ class block_course_descendants extends block_list {
             return $this->content;
         }
 
+        $blockcontext = context_block::instance($this->instance->id);
+
+        if (!enrol_is_enabled('meta')) {
+            if (has_capability('block/course_descendants:configure', $blockcontext)) {
+                $this->content = new stdClass;
+                $this->content->items = array();
+                $this->content->icons = array();
+                $this->content->footer = '<div class="error">'.get_string('metasnotenabled', 'block_course_descendants').'</div>';
+            } else {
+                $this->content = new stdClass;
+                $this->content->items = array();
+                $this->content->icons = array();
+                $this->content->footer = '';
+                $this->title = '';
+            }
+        }
+
         // Fetch direct ascendants that are metas who point the current course as descendant.
         // Admin sees all descendants.
-        if (@$this->config->checkenrollment && !has_capability('moodle/site:config', context_system::instance())) {
+        if (!empty($this->config->checkenrollment) && !has_capability('moodle/site:config', context_system::instance())) {
             $sql = "
-                 SELECT DISTINCT 
+                 SELECT DISTINCT
                     c.id,
                     c.shortname,
                     c.fullname,
@@ -69,7 +88,7 @@ class block_course_descendants extends block_list {
                     cc.name as catname,
                     cc.id as catid,
                     cc.visible as catvisible
-                 FROM 
+                 FROM
                      {course} c,
                      {course_categories} cc,
                      {enrol} e,
@@ -90,7 +109,7 @@ class block_course_descendants extends block_list {
             ";
         } else {
             $sql = "
-                 SELECT DISTINCT 
+                 SELECT DISTINCT
                     c.id,
                     c.shortname,
                     c.fullname,
@@ -115,7 +134,7 @@ class block_course_descendants extends block_list {
         }
 
         $descendants = $DB->get_records_sql($sql, array($COURSE->id));
-        
+
         $this->content = new stdClass;
         $this->content->items = array();
         $this->content->icons = array();
@@ -150,7 +169,13 @@ class block_course_descendants extends block_list {
                     }
 
                     $coursename = format_string($descendant->fullname);
-                    $this->content->items[] = "<a title=\"" .s($coursename)."\" href=\"{$CFG->wwwroot}/course/view.php?id={$descendant->id}\">{$coursename}</a>";
+                    $courseurl = new moodle_url('/course/view.php', array('id' => $descendant->id));
+                    $item = '<a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
+                    if (!empty($this->config->showdescription)) {
+                        $description = format_text($descendant->summary);
+                        $item .= '<div class="block-descendants course-description">'.$description.'</div>';
+                    }
+                    $this->content->items[] = $item;
                 }
             }
         } else {
@@ -162,18 +187,15 @@ class block_course_descendants extends block_list {
     }
 
     /**
-     *
+     * Serialize and store config data
      */
-    function user_can_addto($page) {
-        global $CFG, $COURSE;
+    function instance_config_save($data, $nolongerused = false) {
+        global $DB;
 
-        return true;
+        if (!isset($data->showdescription)) $data->showdescription = 0;
+        if (!isset($data->checkenrollment)) $data->checkenrollment = 0;
 
-        $context = context_course::instance($COURSE->id);
-        if (has_capability('block/course_descendants:addinstance', $context)) {
-            return true;
-        }
-        return false;
+        parent::instance_config_save($data, false);
     }
 
     /**
@@ -183,7 +205,7 @@ class block_course_descendants extends block_list {
         global $CFG, $COURSE;
 
         $context = context_course::instance($COURSE->id);
-        
+
         if (has_capability('block/course_descendants:configure', $context)) {
             return true;
         }
