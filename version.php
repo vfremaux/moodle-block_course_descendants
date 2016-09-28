@@ -30,3 +30,6 @@ $plugin->requires  = 2011120503;        // Requires this Moodle version
 $plugin->release = '2.7.0 (Build 2013011800)';
 $plugin->component = 'block_course_descendants'; // Full name of the plugin (used for diagnostics)
 $plugin->maturity = MATURITY_RC;
+
+// Non moodle attributes.
+$plugin->codeincrement = '2.7.0000';
