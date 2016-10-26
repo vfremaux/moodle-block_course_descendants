@@ -54,7 +54,7 @@ class block_course_descendants extends block_list {
     function get_content() {
         global $THEME, $CFG, $COURSE, $USER, $DB;
 
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
 
