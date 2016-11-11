@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Main class
  *
@@ -24,26 +22,27 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 class block_course_descendants extends block_list {
 
-    function init() {
+    public function init() {
         $this->title = get_string('title', 'block_course_descendants');
     }
 
-    function has_config() {
+    public function has_config() {
         return false;
     }
 
-    function instance_allow_config() {
+    public function instance_allow_config() {
         return true;
     }
 
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('all' => false, 'course' => true, 'site' => false);
     }
 
-    function specialization() {
+    public function specialization() {
         if (!empty($this->config->blocktitle)) {
             $this->title = format_string($this->config->blocktitle);
         } else {
@@ -51,8 +50,8 @@ class block_course_descendants extends block_list {
         }
     }
 
-    function get_content() {
-        global $THEME, $CFG, $COURSE, $USER, $DB;
+    public function get_content() {
+        global $COURSE, $USER, $DB;
 
         if ($this->content !== null) {
             return $this->content;
@@ -118,7 +117,7 @@ class block_course_descendants extends block_list {
                     cc.id as catid,
                     cc.name as catname,
                     cc.visible as catvisible
-                 FROM 
+                 FROM
                      {course} c,
                      {course_categories} cc,
                      {enrol} e
@@ -154,7 +153,7 @@ class block_course_descendants extends block_list {
                     $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
                 }
 
-                // TODO : check visibility on course
+                // TODO : check visibility on course.
                 $context = context_course::instance($descendant->id);
 
                 if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)) {
@@ -189,11 +188,14 @@ class block_course_descendants extends block_list {
     /**
      * Serialize and store config data
      */
-    function instance_config_save($data, $nolongerused = false) {
-        global $DB;
+    public function instance_config_save($data, $nolongerused = false) {
 
-        if (!isset($data->showdescription)) $data->showdescription = 0;
-        if (!isset($data->checkenrollment)) $data->checkenrollment = 0;
+        if (!isset($data->showdescription)) {
+            $data->showdescription = 0;
+        }
+        if (!isset($data->checkenrollment)) {
+            $data->checkenrollment = 0;
+        }
 
         parent::instance_config_save($data, false);
     }
@@ -201,8 +203,8 @@ class block_course_descendants extends block_list {
     /**
      *
      */
-    function user_can_edit() {
-        global $CFG, $COURSE;
+    public function user_can_edit() {
+        global $COURSE;
 
         $context = context_course::instance($COURSE->id);
 

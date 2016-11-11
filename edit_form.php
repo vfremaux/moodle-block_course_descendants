@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * minimalistic edit form
  *
@@ -24,13 +22,13 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2013 Valery Fremaux / valery.fremaux@gmail.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/formslib.php");
+require_once($CFG->libdir.'/formslib.php');
 
 class block_course_descendants_edit_form extends block_edit_form {
 
-    function specific_definition($mform) {
-        global $CFG,$DB, $COURSE;
+    public function specific_definition($mform) {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
@@ -42,7 +40,8 @@ class block_course_descendants_edit_form extends block_edit_form {
         $mform->addElement('checkbox', 'config_checkenrollment', get_string('configcheckenrollment', 'block_course_descendants'));
         $mform->setDefault('config_checkenrollment', 1);
 
-        $mform->addElement('text', 'config_stringlimit', get_string('configstringlimit', 'block_course_descendants'), array('size' => 4, 'maxlength' => 3));
+        $label = get_string('configstringlimit', 'block_course_descendants');
+        $mform->addElement('text', 'config_stringlimit', $label, array('size' => 4, 'maxlength' => 3));
         $mform->setType('config_stringlimit', PARAM_INT);
 
     }
