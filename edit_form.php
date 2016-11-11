@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * minimalistic edit form
  *
@@ -24,13 +22,13 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2013 Valery Fremaux / valery.fremaux@gmail.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/formslib.php");
+require_once($CFG->libdir.'/formslib.php');
 
 class block_course_descendants_edit_form extends block_edit_form {
 
-    function specific_definition($mform) {
-        global $CFG,$DB, $COURSE;
+    public function specific_definition($mform) {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
