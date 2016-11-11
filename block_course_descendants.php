@@ -51,7 +51,7 @@ class block_course_descendants extends block_list {
     }
 
     public function get_content() {
-        global $THEME, $CFG, $COURSE, $USER, $DB;
+        global $COURSE, $USER, $DB;
 
         if ($this->content !== null) {
             return $this->content;
@@ -117,7 +117,7 @@ class block_course_descendants extends block_list {
                     cc.id as catid,
                     cc.name as catname,
                     cc.visible as catvisible
-                 FROM 
+                 FROM
                      {course} c,
                      {course_categories} cc,
                      {enrol} e
