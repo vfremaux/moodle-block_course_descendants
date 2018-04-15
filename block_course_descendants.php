@@ -84,6 +84,8 @@ class block_course_descendants extends block_list {
                     c.fullname,
                     c.sortorder,
                     c.visible,
+                    c.summary,
+                    c.summaryformat,
                     cc.name as catname,
                     cc.id as catid,
                     cc.visible as catvisible
@@ -114,6 +116,8 @@ class block_course_descendants extends block_list {
                     c.fullname,
                     c.sortorder,
                     c.visible,
+                    c.summary,
+                    c.summaryformat,
                     cc.id as catid,
                     cc.name as catname,
                     cc.visible as catvisible
