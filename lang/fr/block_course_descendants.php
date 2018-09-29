@@ -15,8 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Capabilities.
-$string['course_descendants:addinstance'] = 'Peut ajouter une instance';
-$string['course_descendants:configure'] = 'Peut configurer';
+$string['course_descendants:addinstance'] = 'Ajouter une instance';
+$string['course_descendants:configure'] = 'Configurer';
+
+// Privacy
+$string['privacy:metadata'] = 'Le bloc cours Descendants ne détient directement aucune donnée relative aux utilisateurs.';
 
 $string['title'] = 'Espaces descendants';
 $string['configblocktitle'] = 'Titre (laisser vide pour ne rien afficher)';
