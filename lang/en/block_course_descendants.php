@@ -18,6 +18,9 @@
 $string['course_descendants:addinstance'] = 'Can add an instance';
 $string['course_descendants:configure'] = 'Can configure';
 
+// Privacy
+$string['privacy:metadata'] = 'The Course Descendants block does not directly store any personal data about any user.';
+
 $string['title'] = 'Master courses';
 $string['configblocktitle'] = 'Title (leave blank to hide)';
 $string['blockname'] = 'Descendants courses';
