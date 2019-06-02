@@ -51,7 +51,8 @@ class block_course_descendants extends block_list {
     }
 
     public function get_content() {
-        global $COURSE, $USER, $DB;
+        global $CFG, $COURSE, $OUTPUT, $USER, $DB; //Included CFG to be able to get contacts
+		require_once($CFG->dirroot.'/user/lib.php');
 
         if ($this->content !== null) {
             return $this->content;
@@ -75,8 +76,9 @@ class block_course_descendants extends block_list {
         }
 
         // Fetch direct ascendants that are metas who point the current course as descendant.
-        // Admin sees all descendants.
-        if (!empty($this->config->checkenrollment) && !has_capability('moodle/site:config', context_system::instance())) {
+        // Changed so that anyone who can configure the block can see all the classes (e.g. teachers, useful for teachers to be able to see each others classes)
+		//Changed the query so the only enabled enrolment methods are used
+        if (!empty($this->config->checkenrollment) && !has_capability('block/course_descendants:configure', $blockcontext)) { 
             $sql = "
                  SELECT DISTINCT
                     c.id,
@@ -88,7 +90,8 @@ class block_course_descendants extends block_list {
                     c.summaryformat,
                     cc.name as catname,
                     cc.id as catid,
-                    cc.visible as catvisible
+                    cc.visible as catvisible,
+					cc.sortorder
                  FROM
                      {course} c,
                      {course_categories} cc,
@@ -100,13 +103,14 @@ class block_course_descendants extends block_list {
                     e.customint1 = c.id AND
                     e.courseid = ? AND
                     e.enrol = 'meta' AND
+					e.status = 0 AND 
                     co.instanceid = c.id AND
                     co.contextlevel = ".CONTEXT_COURSE." AND
                     ra.contextid = co.id AND
                     ra.userid = {$USER->id}
-                 ORDER BY
-                     cc.sortorder,
-                     c.sortorder
+				ORDER BY
+					cc.sortorder,
+             		c.sortorder
             ";
         } else {
             $sql = "
@@ -120,7 +124,8 @@ class block_course_descendants extends block_list {
                     c.summaryformat,
                     cc.id as catid,
                     cc.name as catname,
-                    cc.visible as catvisible
+                    cc.visible as catvisible,
+					cc.sortorder
                  FROM
                      {course} c,
                      {course_categories} cc,
@@ -129,10 +134,11 @@ class block_course_descendants extends block_list {
                     cc.id = c.category AND
                     e.courseid = ? AND
                     e.enrol = 'meta' AND
+					e.status = 0 AND
                     e.customint1 = c.id
-                 ORDER BY
-                     cc.sortorder,
-                     c.sortorder
+				ORDER BY
+					cc.sortorder,
+             		c.sortorder
             ";
         }
 
@@ -146,23 +152,23 @@ class block_course_descendants extends block_list {
         if ($descendants) {
             $categorymem = '';
             foreach ($descendants as $descendant) {
-
-                $catcontext = context_coursecat::instance($descendant->catid);
+				
+				$catcontext = context_coursecat::instance($descendant->catid);
                 if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)) {
                     continue;
-                }
-
+                } 
+				
+				/* Edited so that categories are no longer shown
                 if ($categorymem != $descendant->catname) {
                     $categorymem = $descendant->catname;
                     $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
-                }
+                } 
+				*/
 
-                // TODO : check visibility on course.
                 $context = context_course::instance($descendant->id);
-
                 if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)) {
-
-                    $icon  = '';
+					
+                    $icon  = ''; //Can have an Icon
                     $this->content->icons[] = $icon;
 
                     if (!empty($this->config->stringlimit)) {
@@ -173,13 +179,87 @@ class block_course_descendants extends block_list {
 
                     $coursename = format_string($descendant->fullname);
                     $courseurl = new moodle_url('/course/view.php', array('id' => $descendant->id));
-                    $item = '<a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
-                    if (!empty($this->config->showdescription)) {
+                    $item = '<div class="block-descendants"><a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
+					
+					
+					if ($descendant instanceof stdClass) {
+            			require_once($CFG->libdir. '/coursecatlib.php');
+            			$descendant = new course_in_list($descendant);
+       				}
+					
+					/* extended this to show image and picture */ 
+					if (!empty($this->config->showdescription)) {
+						$courseimage = '';
+						foreach ($descendant->get_course_overviewfiles() as $file) {
+							$isimage = $file->is_valid_image();
+							$url = file_encode_url("$CFG->wwwroot/pluginfile.php",
+								'/'. $file->get_contextid(). '/'. $file->get_component(). '/'.
+							$file->get_filearea(). $file->get_filepath(). $file->get_filename(), !$isimage);
+							if ($isimage) {
+								$courseimage = '<a title="' .$coursename.'" href="'.$courseurl.'"><div class="courseimagesmall" style="background-image: url('.$url.');"></div></a>';
+							} 
+						}
+						$item .= '<div class="descendantscourseimage">'.$courseimage.'</div>';
                         $description = format_text($descendant->summary);
-                        $item .= '<div class="block-descendants course-description">'.$description.'</div>';
+                        $item .= '<div class="course-description">'.$description.'</div>';
                     }
+				
+					/*Now find course contacts*/
+					$item .= '<div class="contacts">';
+					$current_role = '';
+					$i = 0;
+					$list_course_contacts = $descendant->get_course_contacts();
+
+					foreach ($list_course_contacts as $userid => $coursecontact) {
+						if ($i == 0) {
+							$current_role = $coursecontact['rolename']; /*sets to teacher */
+							$item .= '<span class="currentrole">'.$current_role.'</span>: ';
+							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+							$item .= '<div class="contact">';
+							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+							/*
+							$user = core_user::get_user($userid, '*', MUST_EXIST);
+							$item .= $OUTPUT->user_picture($user, array('size' => 80));
+							*/
+							$item .= $name;
+							
+						}
+						if (($i > 0) AND ($coursecontact['rolename'] == $current_role)) {
+							$item .= '</div>';
+							$item .= ', ';
+							$item .= '<div class="contact">';
+							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+							/*
+							$user = core_user::get_user($userid, '*', MUST_EXIST);
+							$item .= $OUTPUT->user_picture($user, array('size' => 80)); 
+							*/
+							$item .= $name;
+							
+						}
+						else if ($i > 0) { //no longer the same role, get new role
+							$item .= '</div>';
+							$current_role = $coursecontact['rolename']; /*sets to next role */
+							$item .= '<span class="currentrole">'.$current_role.'</span>: ';
+							
+							$item .= '<div class="contact">';
+							$current_role = $coursecontact['rolename'];
+							$item .= $current_role.': ';
+							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+							/*
+							$user = core_user::get_user($userid, '*', MUST_EXIST);
+							$item .= $OUTPUT->user_picture($user, array('size' => 80));
+							*/
+							$item.= $name; 
+						}
+						$i++;
+					}
+					$item .= '</div></div>'; 
+					//END EDIT
                     $this->content->items[] = $item;
                 }
+				
             }
         } else {
             // If no descendants, make block invisible for everyone except when editing.
