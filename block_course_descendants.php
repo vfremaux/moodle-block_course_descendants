@@ -74,10 +74,14 @@ class block_course_descendants extends block_list {
                 $this->title = '';
             }
         }
+		
+		/*Not sure how to do this, I want to be able to change the max height of the content-div to the height limit. Then set overflow-y to scroll.
+		$heightlimit = $this->config->heightlimit;
+		*/
 
         // Fetch direct ascendants that are metas who point the current course as descendant.
         // Changed so that anyone who can configure the block can see all the classes (e.g. teachers, useful for teachers to be able to see each others classes)
-		//Changed the query so the only enabled enrolment methods are used
+		// Changed the query so the only enabled enrolment methods are used
         if (!empty($this->config->checkenrollment) && !has_capability('block/course_descendants:configure', $blockcontext)) { 
             $sql = "
                  SELECT DISTINCT
@@ -158,7 +162,7 @@ class block_course_descendants extends block_list {
                     continue;
                 } 
 				
-				/* Edited so that categories are no longer shown
+				/* Edited so that categories are no longer shown - maybe this should be in config
                 if ($categorymem != $descendant->catname) {
                     $categorymem = $descendant->catname;
                     $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
@@ -179,16 +183,19 @@ class block_course_descendants extends block_list {
 
                     $coursename = format_string($descendant->fullname);
                     $courseurl = new moodle_url('/course/view.php', array('id' => $descendant->id));
-                    $item = '<div class="block-descendants"><a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
 					
+					/*Start of large div block for each descendant*/
+                    $item = '<div class="descdescendant">';
 					
+					/* Need to get proper course object to get course image */
 					if ($descendant instanceof stdClass) {
             			require_once($CFG->libdir. '/coursecatlib.php');
             			$descendant = new course_in_list($descendant);
        				}
 					
-					/* extended this to show image and picture */ 
-					if (!empty($this->config->showdescription)) {
+					/* Show Course Image */
+					if ($this->config->showcourseimage == 1) {
+                        $description = format_text($descendant->summary);
 						$courseimage = '';
 						foreach ($descendant->get_course_overviewfiles() as $file) {
 							$isimage = $file->is_valid_image();
@@ -196,68 +203,86 @@ class block_course_descendants extends block_list {
 								'/'. $file->get_contextid(). '/'. $file->get_component(). '/'.
 							$file->get_filearea(). $file->get_filepath(). $file->get_filename(), !$isimage);
 							if ($isimage) {
-								$courseimage = '<a title="' .$coursename.'" href="'.$courseurl.'"><div class="courseimagesmall" style="background-image: url('.$url.');"></div></a>';
+								$courseimage = '<a title="' .$coursename.'" href="'.$courseurl.'"><div class="descimagesmall" style="background-image: url('.$url.');"></div></a>';
 							} 
 						}
-						$item .= '<div class="descendantscourseimage">'.$courseimage.'</div>';
-                        $description = format_text($descendant->summary);
-                        $item .= '<div class="course-description">'.$description.'</div>';
-                    }
-				
-					/*Now find course contacts*/
-					$item .= '<div class="contacts">';
-					$current_role = '';
-					$i = 0;
-					$list_course_contacts = $descendant->get_course_contacts();
-
-					foreach ($list_course_contacts as $userid => $coursecontact) {
-						if ($i == 0) {
-							$current_role = $coursecontact['rolename']; /*sets to teacher */
-							$item .= '<span class="currentrole">'.$current_role.'</span>: ';
-							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
-							$item .= '<div class="contact">';
-							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
-							/*
-							$user = core_user::get_user($userid, '*', MUST_EXIST);
-							$item .= $OUTPUT->user_picture($user, array('size' => 80));
-							*/
-							$item .= $name;
-							
-						}
-						if (($i > 0) AND ($coursecontact['rolename'] == $current_role)) {
-							$item .= '</div>';
-							$item .= ', ';
-							$item .= '<div class="contact">';
-							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
-							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
-							/*
-							$user = core_user::get_user($userid, '*', MUST_EXIST);
-							$item .= $OUTPUT->user_picture($user, array('size' => 80)); 
-							*/
-							$item .= $name;
-							
-						}
-						else if ($i > 0) { //no longer the same role, get new role
-							$item .= '</div>';
-							$current_role = $coursecontact['rolename']; /*sets to next role */
-							$item .= '<span class="currentrole">'.$current_role.'</span>: ';
-							
-							$item .= '<div class="contact">';
-							$current_role = $coursecontact['rolename'];
-							$item .= $current_role.': ';
-							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
-							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
-							/*
-							$user = core_user::get_user($userid, '*', MUST_EXIST);
-							$item .= $OUTPUT->user_picture($user, array('size' => 80));
-							*/
-							$item.= $name; 
-						}
-						$i++;
+						$item .= '<div class="desccourseimage">'.$courseimage.'</div>';
 					}
-					$item .= '</div></div>'; 
-					//END EDIT
+					
+					$item .= '<div class="descdetails">';
+					
+					/* show course name */
+					$item .= '<div class="desctitle"><a title="'.$coursename.'"href="'.$courseurl.'">'.$coursename.'</a></div>';
+				
+					/* show course contacts */
+					if ($this->config->showcoursecontact == 1) {
+					
+						$item .= '<div class="desccontacts">';
+						$current_role = '';
+						$i = 0;
+						$list_course_contacts = $descendant->get_course_contacts();
+
+						foreach ($list_course_contacts as $userid => $coursecontact) {
+							if ($i == 0) {
+								$current_role = $coursecontact['rolename']; /*sets to teacher */
+								$item .= '<span class="desccurrentrole">'.$current_role.'</span>: ';
+								$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+								$item .= '<span class="desccontact">';
+								/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+								/*
+								$user = core_user::get_user($userid, '*', MUST_EXIST);
+								$item .= $OUTPUT->user_picture($user, array('size' => 80));
+								*/
+								$item .= $name;
+
+							}
+							if (($i > 0) AND ($coursecontact['rolename'] == $current_role)) {
+								$item .= '</span>';
+								$item .= ', ';
+								$item .= '<span class="desccontact">';
+								$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+								/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+								/*
+								$user = core_user::get_user($userid, '*', MUST_EXIST);
+								$item .= $OUTPUT->user_picture($user, array('size' => 80)); 
+								*/
+								$item .= $name;
+
+							}
+							else if ($i > 0) { //no longer the same role, get new role
+								$item .= '</span>';
+								$current_role = $coursecontact['rolename']; /*sets to next role */
+								$item .= '<span class="desccurrentrole">'.$current_role.'</span>: ';
+
+								$item .= '<span class="desccontact">';
+								$current_role = $coursecontact['rolename'];
+								$item .= $current_role.': ';
+								$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
+								/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
+								/*
+								$user = core_user::get_user($userid, '*', MUST_EXIST);
+								$item .= $OUTPUT->user_picture($user, array('size' => 80));
+								*/
+								$item.= $name; 
+							}
+							$i++;
+						}
+						$item .= '</span>';
+						$item .= '</div>';
+					}
+					
+					/* show description */
+					if ($this->config->showdescription == 1) {
+                        $description = format_text($descendant->summary);
+                        $item .= '<div class="descdescription">'.$description.'</div>';
+                    }
+					
+					$item .= '</div>';
+					
+					//Close Descendant Div block
+					$item .= '</div>'; 
                     $this->content->items[] = $item;
+					
                 }
 				
             }
@@ -292,6 +317,7 @@ class block_course_descendants extends block_list {
 
         $context = context_course::instance($COURSE->id);
 
+		//In my application I have given this permission to teachers
         if (has_capability('block/course_descendants:configure', $context)) {
             return true;
         }

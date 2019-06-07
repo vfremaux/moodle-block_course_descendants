@@ -22,45 +22,56 @@
  *             2019
  */
 
-.block-descendants { 
-	margin-bottom:10px; 
-	display:inherit;
+.descdescendant { 
+	margin-top:2px;
+	margin-bottom:12px; 
 }
 
-.block-descendants>a {
-	display:block;
-	margin-bottom:0px;
-	font-weight:600;
-}
-
-.block-descendants .descendantscourseimage {
+.descdescendant .desccourseimage {
 	float:left;
-	margin-top:4px;
 	margin-right:10px;
+	margin-top:3px;
 }
 
-.block-descendants .courseimagesmall {
+.descdescendant .desccourseimage .descimagesmall {
 	width: 70px;
-	height: 45px;
+	height: 52px;
 	background-size: cover;
+	/*border:thin solid #8b8b8b;*/
 }
 
-.block-descendants .course-description
+.descdescendant .descdetails {
+	min-height:52px;
+}
+
+.descdescendant .descdetails .desctitle {
+	font-weight:600;
+	font-size:12px;
+	margin-bottom:1px;
+}
+
+.descdescendant .descdetails .descdescription
 {
 	font-size:11px;
-	display:inline;
 }
 
-.block-descendants .contacts { 
-	font-size:11px; 
-	display:inline;
+.descdescendant .descdetails .desccontacts{ 
+	font-size:11px;
+	line-height: 16px;
 }
 
-.block-descendants .contact {
-	display:inline-block;
+.descdescendant .descdetails .desccontacts{
+
 }
 
-.block-descendants .currentrole {
+.descdescendant .desccurrentrole {
 	font-weight:600 !important;
-	/*display:none;*/
 }
+
+/*This block uses a list, so had to adjust the list formatting so that text wrapped correctly*/
+.block_course_descendants.block.list_block .unlist > li > .column
+{
+	display:block !important;
+}
+
+
