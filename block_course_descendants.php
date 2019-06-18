@@ -75,7 +75,7 @@ class block_course_descendants extends block_list {
             }
         }
 		
-		/*Not sure how to do this, I want to be able to change the max height of the content-div to the height limit. Then set overflow-y to scroll.
+		/*Not sure how to do this, I want to be able to change the max height of the content-div to the height limit. Then set overflow-y to scroll to cater for a long list of courses.
 		$heightlimit = $this->config->heightlimit;
 		*/
 
@@ -279,13 +279,17 @@ class block_course_descendants extends block_list {
 					
 					$item .= '</div>';
 					
+					//http://localhost/enrol/editinstance.php?type=meta&courseid=2
 					//Close Descendant Div block
 					$item .= '</div>'; 
                     $this->content->items[] = $item;
-					
                 }
-				
             }
+			/* Add a short cut to adding more courses */
+			if (has_capability('block/course_descendants:configure', $blockcontext)) {
+				$addmetalink = html_writer::link(new moodle_url('/enrol/editinstance.php', array('type' => 'meta', 'courseid' => $COURSE->id)), 'Link another course');
+				$this->content->items[] = $addmetalink;
+			}
         } else {
             // If no descendants, make block invisible for everyone except when editing.
             $this->title = '';

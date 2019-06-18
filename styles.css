@@ -24,24 +24,27 @@
 
 .descdescendant { 
 	margin-top:2px;
-	margin-bottom:12px; 
+	margin-bottom:12px;
+	display:flex;
 }
 
 .descdescendant .desccourseimage {
 	float:left;
 	margin-right:10px;
 	margin-top:3px;
+	margin-bottom:10px;
 }
 
 .descdescendant .desccourseimage .descimagesmall {
-	width: 70px;
-	height: 52px;
+	min-width: 70px;
+	min-height: 52px;
+	width:100%;
 	background-size: cover;
 	/*border:thin solid #8b8b8b;*/
 }
 
 .descdescendant .descdetails {
-	min-height:52px;
+	overflow:auto;
 }
 
 .descdescendant .descdetails .desctitle {
