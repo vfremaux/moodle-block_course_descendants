@@ -1,0 +1,80 @@
+/** This file is part of Moodle - http://moodle.org/
+ *
+ * Moodle is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Moodle is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Block Descendants css file.
+ *
+ * @package    block_course_descendants
+ * @author     Brad Nielsen
+ *             2019
+ */
+
+.descdescendant { 
+	margin-top:2px;
+	margin-bottom:8px;
+	display:flex;
+}
+
+.descdescendant .desccourseimage {
+	float:left;
+	margin-right:10px;
+	margin-top:3px;
+	margin-bottom:10px;
+}
+
+.descdescendant .desccourseimage .descimagesmall {
+	min-width: 70px;
+	min-height: 52px;
+	width:100%;
+	background-size: cover;
+	/*border:thin solid #8b8b8b;*/
+}
+
+.descdescendant .descdetails {
+	overflow:auto;
+}
+
+.descdescendant .descdetails .desctitle {
+	font-weight:600;
+	font-size:12px;
+	margin-bottom:1px;
+}
+
+.descdescendant .descdetails .descdescription
+{
+	font-size:11px;
+}
+
+.descdescendant .descdetails .desccontacts{ 
+	font-size:11px;
+	line-height: 16px;
+}
+
+.descdescendant .descdetails .desccontacts{
+
+}
+
+.descdescendant .desccurrentrole {
+	font-weight:600 !important;
+}
+
+/*This block uses a list, so had to adjust the list formatting so that text wrapped correctly*/
+.block_course_descendants.block.list_block .unlist > li > .column
+{
+	display:block !important;
+}
+
+

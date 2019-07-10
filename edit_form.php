@@ -32,17 +32,32 @@ class block_course_descendants_edit_form extends block_edit_form {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
-        $mform->addElement('text', 'config_blocktitle', get_string('configblocktitle', 'block_course_descendants'));
+        $mform->addElement('text', 'config_blocktitle', get_string('blocktitle', 'block_course_descendants'));
         $mform->setType('config_blocktitle', PARAM_CLEANHTML);
 
-        $mform->addElement('checkbox', 'config_showdescription', get_string('configshowdescription', 'block_course_descendants'));
+        $mform->addElement('selectyesno', 'config_showdescription', get_string('showdescription', 'block_course_descendants'));
+		$mform->setDefault('config_showdescription', 1);
+        $mform->setType('config_showdescription', PARAM_INTEGER);
+		
+		$mform->addElement('selectyesno', 'config_showcourseimage', get_string('showcourseimage', 'block_course_descendants'));
+		$mform->setDefault('config_showcourseimage', 1);
+        $mform->setType('config_showcourseimage', PARAM_INTEGER);
+		
+		$mform->addElement('selectyesno', 'config_showcoursecontact', get_string('showcoursecontact', 'block_course_descendants'));
+		$mform->setDefault('config_showcoursecontact', 1);
+        $mform->setType('config_showcoursecontact', PARAM_INTEGER);
 
-        $mform->addElement('checkbox', 'config_checkenrollment', get_string('configcheckenrollment', 'block_course_descendants'));
-        $mform->setDefault('config_checkenrollment', 1);
+        $mform->addElement('selectyesno', 'config_checkenrollment', get_string('checkenrollment', 'block_course_descendants'));
+		$mform->setDefault('config_checkenrollment', 1);
+        $mform->setType('config_checkenrollment', PARAM_INTEGER);
 
-        $label = get_string('configstringlimit', 'block_course_descendants');
+        $label = get_string('stringlimit', 'block_course_descendants');
         $mform->addElement('text', 'config_stringlimit', $label, array('size' => 4, 'maxlength' => 3));
-        $mform->setType('config_stringlimit', PARAM_INT);
+		$mform->setType('config_stringlimit', PARAM_INTEGER);
+		
+		/*$label = get_string('heightlimit', 'block_course_descendants');
+        $mform->addElement('text', 'config_heightlimit', $label, array('size' => 4, 'maxlength' => 3));
+        $mform->setType('config_heightlimit', PARAM_INTEGER);*/
 
     }
 }
