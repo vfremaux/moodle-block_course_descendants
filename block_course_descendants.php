@@ -165,7 +165,7 @@ class block_course_descendants extends block_list {
                 }
 				
 				//check to see if past class, if so hide
-				if ($descendant->enddate && $descendant->enddate < time()) {
+				if (!empty($descendant->enddate) && $descendant->enddate < time()) {
 					continue;
 				}
 				
