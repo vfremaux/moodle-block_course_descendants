@@ -89,6 +89,7 @@ class block_course_descendants extends block_list {
                     c.shortname,
                     c.fullname,
                     c.sortorder,
+					c.enddate,
                     c.visible,
                     c.summary,
                     c.summaryformat,
@@ -122,6 +123,7 @@ class block_course_descendants extends block_list {
                     c.id,
                     c.shortname,
                     c.fullname,
+					c.enddate,
                     c.sortorder,
                     c.visible,
                     c.summary,
@@ -160,7 +162,12 @@ class block_course_descendants extends block_list {
 				$catcontext = context_coursecat::instance($descendant->catid);
                 if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)) {
                     continue;
-                } 
+                }
+				
+				//check to see if past class, if so hide
+				if ($descendant->enddate && $descendant->enddate < time()) {
+					continue;
+				}
 				
 				/* Edited so that categories are no longer shown - maybe this should be in config
                 if ($categorymem != $descendant->catname) {
@@ -287,7 +294,7 @@ class block_course_descendants extends block_list {
             }
 			/* Add a short cut to adding more courses */
 			if (has_capability('block/course_descendants:configure', $blockcontext)) {
-				$addmetalink = html_writer::link(new moodle_url('/enrol/editinstance.php', array('type' => 'meta', 'courseid' => $COURSE->id)), 'Link another course');
+				$addmetalink = html_writer::link(new moodle_url('/enrol/editinstance.php', array('type' => 'meta', 'courseid' => $COURSE->id)), 'Link another Class');
 				$this->content->items[] = $addmetalink;
 			}
         } else {
