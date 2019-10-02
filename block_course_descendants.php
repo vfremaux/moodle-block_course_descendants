@@ -109,6 +109,7 @@ class block_course_descendants extends block_list {
                     e.courseid = ? AND
                     e.enrol = 'meta' AND
 					e.status = 0 AND 
+					ue.status = 0
                     co.instanceid = c.id AND
                     co.contextlevel = ".CONTEXT_COURSE." AND
                     ra.contextid = co.id AND

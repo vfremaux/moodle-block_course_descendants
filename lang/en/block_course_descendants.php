@@ -21,7 +21,7 @@ $string['course_descendants:configure'] = 'Can configure';
 // Privacy
 $string['privacy:metadata'] = 'The Course Descendants block does not directly store any personal data about any user.';
 
-$string['title'] = 'Master courses';
+$string['title'] = 'Class pages';
 $string['blocktitle'] = 'Title (leave blank to hide)';
 $string['blockname'] = 'Descendants courses';
 $string['pluginname'] = 'Descendants courses';
