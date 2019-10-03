@@ -76,12 +76,12 @@ class block_course_descendants extends block_list {
         }
 		
 		/*Not sure how to do this, I want to be able to change the max height of the content-div to the height limit. Then set overflow-y to scroll to cater for a long list of courses.
-		$heightlimit = $this->config->heightlimit;
+		$heightlimit = $this->config->heightlimit; I have done this using css in my own site
 		*/
 
         // Fetch direct ascendants that are metas who point the current course as descendant.
         // Changed so that anyone who can configure the block can see all the classes (e.g. teachers, useful for teachers to be able to see each others classes)
-		// Changed the query so the only enabled enrolment methods are used
+		// Changed the query so the only enabled enrolment methods are used, if a metalink is disable its no longer shown
         if (!empty($this->config->checkenrollment) && !has_capability('block/course_descendants:configure', $blockcontext)) { 
             $sql = "
                  SELECT DISTINCT
@@ -169,7 +169,7 @@ class block_course_descendants extends block_list {
 					continue;
 				}
 				
-				/* Edited so that categories are no longer shown - maybe this should be in config
+				/* Edited so that categories are no longer shown - maybe this should be a config option
                 if ($categorymem != $descendant->catname) {
                     $categorymem = $descendant->catname;
                     $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
@@ -177,6 +177,12 @@ class block_course_descendants extends block_list {
 				*/
 
                 $context = context_course::instance($descendant->id);
+				
+				//BRAD EDIT check to see if the users enrolment is active inside descendant 
+				if (!is_enrolled($context,$USER->id,'',true) && !has_capability('block/course_descendants:configure', $blockcontext)){
+					continue;
+				}
+				
                 if ($descendant->visible || has_capability('moodle/course:viewhiddencourses', $context)) {
 					
                     $icon  = ''; //Can have an Icon
@@ -246,7 +252,7 @@ class block_course_descendants extends block_list {
 							if (($i > 0) AND ($coursecontact['rolename'] == $current_role)) {
 								$item .= '</span>';
 								$item .= ', ';
-								$item .= '<span class="desccontact">';
+								$item .= ' <span class="desccontact">';
 								$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
 								/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
 								/*
