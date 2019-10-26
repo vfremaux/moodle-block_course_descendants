@@ -80,7 +80,7 @@ class block_course_descendants extends block_list {
 		*/
 
         // Fetch direct ascendants that are metas who point the current course as descendant.
-        // Changed so that anyone who can configure the block can see all the classes (e.g. teachers, useful for teachers to be able to see each others classes)
+        // Changed so that anyone who can configure the block can see all the classes (e.g. teachers, useful for teachers to be able to see each other's classes)
 		// Changed the query so the only enabled enrolment methods are used, if a metalink is disable its no longer shown
         if (!empty($this->config->checkenrollment) && !has_capability('block/course_descendants:configure', $blockcontext)) { 
             $sql = "
@@ -170,7 +170,7 @@ class block_course_descendants extends block_list {
 					continue;
 				}
 				
-				/* Edited so that categories are no longer shown - maybe this should be a config option - the admin whats courses to be categorised
+				/* Edited so that categories are no longer shown - maybe this should be a config option
                 if ($categorymem != $descendant->catname) {
                     $categorymem = $descendant->catname;
                     $this->content->items[] = '<b>'.format_string($descendant->catname).'</b>';
@@ -184,9 +184,6 @@ class block_course_descendants extends block_list {
 					continue;
 				}
 				
-				if (has_capability('moodle/course:viewhiddencourses', $context)) {
-					print_r("Can view hidden courses");
-				}
 				//Check to see if course is visible
                 if (!$descendant->visible && !has_capability('moodle/course:viewhiddencourses', $context)) {
 					continue;
