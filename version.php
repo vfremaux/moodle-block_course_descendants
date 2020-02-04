@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018051700;
+$plugin->version = 2019121700;
 $plugin->requires = 2018051700;
 $plugin->release = '3.5.0.0';
 $plugin->component = 'block_course_descendants'; // Full name of the plugin (used for diagnostics).

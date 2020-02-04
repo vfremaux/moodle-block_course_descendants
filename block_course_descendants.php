@@ -267,11 +267,9 @@ class block_course_descendants extends block_list {
 						}
 						else if ($i > 0) { //no longer the same role, get new role
 							$item .= '</span>';
-							$current_role = $coursecontact['rolename']; /*sets to next role */
-							$item .= ' <span class="desccurrentrole">'.$current_role.'</span>: ';
+							$current_role = $coursecontact['rolename']; /*sets to next role BRAD JUST FIXED THIS AGAIN*/
+							$item .= ' <span class="desccurrentrole">'.$current_role.': ' .'</span>: ';
 							$item .= '<span class="desccontact">';
-							$current_role = $coursecontact['rolename'];
-							$item .= $current_role.': ';
 							$name = html_writer::link(new moodle_url('/user/view.php', array('id' => $userid, 'course' => SITEID)), $coursecontact['username']);
 							/*TODO INSERT USERPICTURE IF $this->config->showcontact*/
 							/*
