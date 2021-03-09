@@ -76,7 +76,10 @@ class block_course_descendants extends block_list {
 
         // Fetch direct ascendants that are metas who point the current course as descendant.
         // Admin sees all descendants.
-        if (!empty($this->config->checkenrollment) && !has_capability('moodle/site:config', context_system::instance())) {
+        $isadmin = has_capability('moodle/site:config', context_system::instance());
+        $needcheckenrol = !empty($this->config->checkenrollment);
+
+        if ($needcheckenrol && !$isadmin) {
             $sql = "
                  SELECT DISTINCT
                     c.id,
@@ -161,13 +164,14 @@ class block_course_descendants extends block_list {
 
                 // TODO : check visibility on course.
                 $context = context_course::instance($descendant->id);
-
-                if (!$descendant->visible && has_capability('moodle/course:viewhiddencourses', $context)) {
+                $canseehidden = has_capability('moodle/course:viewhiddencourses', $context);
+                $canedit = has_capability('moodle/course:manageactivities', $context);
+                if (!$descendant->visible && !($canseehidden || $canedit)) {
                     continue;
                 }
 
                 // Check to see if past class, if so hide.
-                if ($descendant->enddate && $descendant->enddate < time()) {
+                if (!empty($descendant->enddate) && ($descendant->enddate < time()) && !($canseehidden || $canedit)) {
                     continue;
                 }
 
@@ -188,7 +192,6 @@ class block_course_descendants extends block_list {
                     $item .= '<div class="block-descendants course-description">'.$description.'</div>';
                 }
                 $this->content->items[] = $item;
-
             }
         } else {
             // If no descendants, make block invisible for everyone except when editing.

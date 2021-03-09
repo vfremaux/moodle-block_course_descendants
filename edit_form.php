@@ -35,9 +35,9 @@ class block_course_descendants_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_blocktitle', get_string('configblocktitle', 'block_course_descendants'));
         $mform->setType('config_blocktitle', PARAM_CLEANHTML);
 
-        $mform->addElement('checkbox', 'config_showdescription', get_string('configshowdescription', 'block_course_descendants'));
+        $mform->addElement('advcheckbox', 'config_showdescription', get_string('configshowdescription', 'block_course_descendants'));
 
-        $mform->addElement('checkbox', 'config_checkenrollment', get_string('configcheckenrollment', 'block_course_descendants'));
+        $mform->addElement('advcheckbox', 'config_checkenrollment', get_string('configcheckenrollment', 'block_course_descendants'));
         $mform->setDefault('config_checkenrollment', 1);
 
         $label = get_string('configstringlimit', 'block_course_descendants');
