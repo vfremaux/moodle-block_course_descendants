@@ -27,10 +27,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2015062400;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2019111200;        // Requires this Moodle version.
-$plugin->release = '3.8.0 (Build 2015062400)';
+$plugin->requires  = 2020061500;        // Requires this Moodle version.
+$plugin->release = '3.7.0 (Build 2015062400)';
 $plugin->component = 'block_course_descendants'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
 
 // Non moodle attributes.
-$plugin->codeincrement = '3.8.0001';
+$plugin->codeincrement = '3.9.0000';
