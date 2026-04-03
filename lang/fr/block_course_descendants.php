@@ -23,8 +23,9 @@ $string['privacy:metadata'] = 'Le bloc cours Descendants ne détient directement
 
 $string['title'] = 'Espaces descendants';
 $string['configblocktitle'] = 'Titre (laisser vide pour ne rien afficher)';
-$string['blockname'] = 'Cours descendants';
+$string['blockname'] = 'Revenir au parcours';
 $string['pluginname'] = 'Cours descendants';
+$string['pluginname_help'] = 'Pour revenir des cours modules (métacours) vers le cours maître.';
 $string['checkenrollment'] = 'Vérification de l\'inscription';
 $string['configcheckenrollment'] = 'Si cette option est active, la liste des cours descendants ne montrera que les cours liés où l\'utilisateur est inscrit';
 $string['configshowdescription'] = 'Si cette option est active, la description de cours sera affichée en dessous du lien vers le cours';
