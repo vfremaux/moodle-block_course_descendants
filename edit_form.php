@@ -31,7 +31,7 @@ require_once($CFG->libdir . '/formslib.php');
  */
 class block_course_descendants_edit_form extends block_edit_form {
     /**
-     * Block's specific d?finition.
+     * Block's specific definition.
      * @param object $mform
      */
     public function specific_definition($mform) {
