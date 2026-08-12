@@ -17,9 +17,9 @@
 /**
  * Capability.
  *
- * @package     block_course_ascendants
+ * @package     block_course_descendants
  * @author      Valery Fremaux <valery.fremaux@gmail.com>
- * @copyright   Valery Fremaux <valery.fremaux@gmail.com> (https://www.activeproelarn.com)
+ * @copyright   Valery Fremaux (https://www.activeproelarn.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
