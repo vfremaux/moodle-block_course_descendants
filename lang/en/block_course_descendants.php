@@ -14,23 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Capabilities.
-$string['course_descendants:addinstance'] = 'Can add an instance';
-$string['course_descendants:configure'] = 'Can configure';
+/**
+ * Lang file.
+ *
+ * @package     block_course_descendants
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   Valery Fremaux (https://www.activeproelarn.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-// Privacy.
-$string['privacy:metadata'] = 'The Course Descendants block does not directly store any personal data about any user.';
-
-$string['title'] = 'Master courses';
-$string['configblocktitle'] = 'Title (leave blank to hide)';
 $string['blockname'] = 'Descendants courses';
-$string['pluginname'] = 'Descendants courses';
-$string['pluginname_help'] = 'A block that helps navigating from metacourses (modules) to master course (enrolment provider).';
 $string['checkenrollment'] = 'Enrollment check';
+$string['configblocktitle'] = 'Title (leave blank to hide)';
 $string['configcheckenrollment'] = 'If enabled, the course descendant list will only display metacourses the user is enrolled in';
 $string['configshowdescription'] = 'If enabled, the course description is shown under the course link';
-$string['stringlimit'] = 'Labels shortening';
 $string['configstringlimit'] = 'Setup a length limit for link labels. 0 means no limit.';
-$string['course_descendants:addinstance'] = 'Can add to course';
+$string['course_descendants:addinstance'] = 'Can add an instance';
 $string['course_descendants:configure'] = 'Can configure';
 $string['metasnotenabled'] = 'Meta course enrolments are disabled at site level';
+$string['pluginname'] = 'Descendants courses';
+$string['pluginname_help'] = 'A block that helps navigating from metacourses (modules) to master course (enrolment provider).';
+$string['privacy:metadata'] = 'The Course Descendants block does not directly store any personal data about any user.';
+$string['stringlimit'] = 'Labels shortening';
+$string['title'] = 'Master courses';

@@ -17,31 +17,52 @@
 /**
  * Main class
  *
- * @package    block_course_descendants
- * @category   blocks
- * @copyright  2O13 Valery Fremaux (valery.fremaux@gmail.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     block_course_descendants
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   2013 Valery Fremaux (https://www.activeprolearn.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
+// phpcs:disable moodle.Commenting.ValidTags.Invalid
+// Abusive PSR12 rule : adds useless spaces in string concatenation.
+// phpcs:disable PSR12.Operators.OperatorSpacing.NoSpaceBefore
+// phpcs:disable PSR12.Operators.OperatorSpacing.NoSpaceAfter
+
+/**
+ * Main block class.
+ */
 class block_course_descendants extends block_list {
-
+    /**
+     * Block initialization.
+     */
     public function init() {
         $this->title = get_string('title', 'block_course_descendants');
     }
 
+    /**
+     * does the block have global settings.
+     */
     public function has_config() {
         return false;
     }
 
+    /**
+     * does the block allow configurate it.
+     */
     public function instance_allow_config() {
         return true;
     }
 
+    /**
+     * acceptable formats to add the block.
+     */
     public function applicable_formats() {
-        return array('all' => false, 'course' => true, 'site' => false);
+        return ['all' => false, 'course' => true, 'site' => false];
     }
 
+    /**
+     * specialistion.
+     */
     public function specialization() {
         if (!empty($this->config->blocktitle)) {
             $this->title = format_string($this->config->blocktitle);
@@ -50,8 +71,14 @@ class block_course_descendants extends block_list {
         }
     }
 
+    /**
+     * Provide block content.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function get_content() {
-        global $COURSE, $USER, $DB;
+        global $COURSE, $USER, $DB, $OUTPUT;
 
         if ($this->content !== null) {
             return $this->content;
@@ -61,14 +88,15 @@ class block_course_descendants extends block_list {
 
         if (!enrol_is_enabled('meta')) {
             if (has_capability('block/course_descendants:configure', $blockcontext)) {
-                $this->content = new stdClass;
-                $this->content->items = array();
-                $this->content->icons = array();
-                $this->content->footer = '<div class="error">'.get_string('metasnotenabled', 'block_course_descendants').'</div>';
+                $this->content = new stdClass();
+                $this->content->items = [];
+                $this->content->icons = [];
+                $lbl = get_string('metasnotenabled', 'block_course_descendants');
+                $this->content->footer = $OUTPUT->notification($lbl);
             } else {
-                $this->content = new stdClass;
-                $this->content->items = array();
-                $this->content->icons = array();
+                $this->content = new stdClass();
+                $this->content->items = [];
+                $this->content->icons = [];
                 $this->content->footer = '';
                 $this->title = '';
             }
@@ -141,19 +169,21 @@ class block_course_descendants extends block_list {
             ";
         }
 
-        $descendants = $DB->get_records_sql($sql, array($COURSE->id));
+        $descendants = $DB->get_records_sql($sql, [$COURSE->id]);
 
-        $this->content = new stdClass;
-        $this->content->items = array();
-        $this->content->icons = array();
+        $this->content = new stdClass();
+        $this->content->items = [];
+        $this->content->icons = [];
         $this->content->footer = '';
 
         if ($descendants) {
             $categorymem = '';
             foreach ($descendants as $descendant) {
-
                 $catcontext = context_coursecat::instance($descendant->catid);
-                if (!$descendant->catvisible && !has_capability('moodle/category:viewhiddencategories', $catcontext)) {
+                if (
+                    !$descendant->catvisible &&
+                    !has_capability('moodle/category:viewhiddencategories', $catcontext)
+                ) {
                     continue;
                 }
 
@@ -171,7 +201,11 @@ class block_course_descendants extends block_list {
                 }
 
                 // Check to see if past class, if so hide.
-                if (!empty($descendant->enddate) && ($descendant->enddate < time()) && !($canseehidden || $canedit)) {
+                if (
+                    !empty($descendant->enddate) &&
+                    ($descendant->enddate < time()) &&
+                    !($canseehidden || $canedit)
+                ) {
                     continue;
                 }
 
@@ -179,14 +213,14 @@ class block_course_descendants extends block_list {
                 $this->content->icons[] = $icon;
 
                 if (!empty($this->config->stringlimit)) {
-                    $fullname = shorten_text(format_string($descendant->fullname), 0 + @$this->config->stringlimit);
+                    $fullname = shorten_text(format_string($descendant->fullname), $this->config->stringlimit ?? 0);
                 } else {
                     $fullname = format_string($descendant->fullname);
                 }
 
-                $coursename = format_string($descendant->fullname);
-                $courseurl = new moodle_url('/course/view.php', array('id' => $descendant->id));
-                $item = '<a title="' .$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
+                $coursename = format_string($fullname);
+                $courseurl = new moodle_url('/course/view.php', ['id' => $descendant->id]);
+                $item = '<a title="'.$coursename.'" href="'.$courseurl.'">'.$coursename.'</a>';
                 if (!empty($this->config->showdescription)) {
                     $description = format_text($descendant->summary);
                     $item .= '<div class="block-descendants course-description">'.$description.'</div>';
@@ -203,8 +237,9 @@ class block_course_descendants extends block_list {
 
     /**
      * Serialize and store config data
+     * @param object $data
      */
-    public function instance_config_save($data, $nolongerused = false) {
+    public function instance_config_save($data) {
 
         if (!isset($data->showdescription)) {
             $data->showdescription = 0;
@@ -217,7 +252,7 @@ class block_course_descendants extends block_list {
     }
 
     /**
-     *
+     * Can user edit the block ?
      */
     public function user_can_edit() {
         global $COURSE;
